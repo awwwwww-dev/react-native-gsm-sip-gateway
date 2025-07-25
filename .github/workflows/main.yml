@@ -54,11 +54,17 @@ jobs:
       - name: Install Yarn
         run: npm install -g yarn
 
-      - name: Install JS Dependencies
+      - name: Clean node_modules and yarn.lock
+        run: rm -rf node_modules yarn.lock
+
+      - name: Install Yarn dependencies
         run: yarn install
 
-      - name: Fix missing CLI platform-android
-        run: yarn add --dev @react-native-community/cli-platform-android
+      - name: Ensure native_modules.gradle exists
+        run: |
+          if [ ! -f "node_modules/@react-native-community/cli-platform-android/native_modules.gradle" ]; then
+            yarn add --dev @react-native-community/cli-platform-android
+          fi
 
       - name: Build Android App (Release AAB)
         run: |
