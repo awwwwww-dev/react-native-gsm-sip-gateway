@@ -72,7 +72,7 @@ jobs:
         working-directory: telon-gateway-app
 
       - name: Upload Android Bundle (.aab)
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: telon-release-aab
           path: telon-gateway-app/android/app/build/outputs/bundle/release/app-release.aab
