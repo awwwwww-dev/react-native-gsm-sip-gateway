@@ -11,26 +11,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Gateway Repo
+      - name: Checkout Main Repo
         uses: actions/checkout@v3
 
-      - name: Checkout react-native-tele
-        uses: actions/checkout@v3
-        with:
-          repository: telon-org/react-native-tele
-          path: react-native-tele
+      - name: Clone react-native-tele
+        run: git clone https://github.com/telon-org/react-native-tele.git telon-gateway-app/react-native-tele
 
-      - name: Checkout react-native-sip2
-        uses: actions/checkout@v3
-        with:
-          repository: telon-org/react-native-sip2
-          path: react-native-sip2
+      - name: Clone react-native-sip2
+        run: git clone https://github.com/telon-org/react-native-sip2.git telon-gateway-app/react-native-sip2
 
-      - name: Checkout react-native-replace-dialer
-        uses: actions/checkout@v3
-        with:
-          repository: telon-org/react-native-replace-dialer
-          path: react-native-replace-dialer
+      - name: Clone react-native-replace-dialer
+        run: git clone https://github.com/telon-org/react-native-replace-dialer.git telon-gateway-app/react-native-replace-dialer
 
       - name: Set up Node.js 18
         uses: actions/setup-node@v3
@@ -43,7 +34,7 @@ jobs:
           distribution: 'temurin'
           java-version: 17
 
-      - name: Cache Node Modules
+      - name: Cache node_modules
         uses: actions/cache@v4
         with:
           path: ~/.npm
@@ -54,20 +45,18 @@ jobs:
       - name: Install Yarn
         run: npm install -g yarn
 
-      - name: Clean node_modules and yarn.lock
+      - name: Clean node_modules
         run: rm -rf node_modules yarn.lock
         working-directory: telon-gateway-app
 
-      - name: Install Yarn dependencies
+      - name: Install JS dependencies
         run: yarn install
         working-directory: telon-gateway-app
 
-      - name: Ensure native_modules.gradle exists (inside telon-gateway-app)
+      - name: Fix missing native_modules.gradle
         run: |
-          if [ ! -f "node_modules/@react-native-community/cli-platform-android/native_modules.gradle" ]; then
-            yarn add --dev @react-native-community/cli-platform-android
-          fi
-        working-directory: telon-gateway-app
+          cd telon-gateway-app
+          yarn add --dev @react-native-community/cli-platform-android
 
       - name: Build Android App (Release AAB)
         run: |
@@ -77,7 +66,7 @@ jobs:
           ./gradlew bundleRelease
         working-directory: telon-gateway-app
 
-      - name: Upload Android Bundle (.aab)
+      - name: Upload AAB
         uses: actions/upload-artifact@v4
         with:
           name: telon-release-aab
